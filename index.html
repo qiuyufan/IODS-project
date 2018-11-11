@@ -92,6 +92,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -137,6 +140,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">IODS course project</h1>
 <h4 class="author"><em>Qiuyu Fan</em></h4>
+<h4 class="date"><em>11/7/2018</em></h4>
 
 </div>
 
@@ -145,7 +149,23 @@ $(document).ready(function () {
 <li><a href="#about-the-project">About the project</a></li>
 <li><a href="#the-course-is-about-openly-sharing-data-and-code-to-achieve-a-certain-goal-or-complete-a-project.">the course is about openly sharing data and code to achieve a certain goal or complete a project.</a></li>
 <li><a href="#link-to-my-github-repository-httpsgithub.comqiuyufaniods-project.git">link to my github repository <a href="https://github.com/qiuyufan/IODS-project.git" class="uri">https://github.com/qiuyufan/IODS-project.git</a></a></li>
-<li><a href="#insert-chapter-2-title-here">Insert chapter 2 title here</a></li>
+<li><a href="#learning2014_linear-regression">Learning2014_linear regression</a></li>
+<li><a href="#the-dataset-learn2014-is-a-data-frame-and-has-183-rows-and-60-columns.">the dataset learn2014 is a data frame and has 183 rows and 60 columns.</a></li>
+<li><a href="#section">3</a></li>
+<li><a href="#gender-age-attitude-deep-stra-surf-and-points">gender, age, attitude, deep, stra, surf and points</a></li>
+<li><a href="#section-1">4</a></li>
+<li><a href="#analysis">Analysis</a></li>
+<li><a href="#section-2">1</a></li>
+<li><a href="#section-3">2</a></li>
+<li><a href="#section-4">3</a></li>
+<li><a href="#after-removing-the-parameters-of-stra-and-surf.-we-have-our-model3-attitude-is-the-only-variable-hitting">4 after removing the parameters of stra and surf. we have our model3, attitude is the only variable hitting</a></li>
+<li><a href="#significance-level-below-0.05">significance level, below 0.05</a></li>
+<li><a href="#section-5">5</a></li>
+<li><a href="#both-models-qq-plot-from-the-show-that-the-errors-of-the-models-are-normally-distributed-which-are-reasonable.">Both models’ QQ plot from the show that the errors of the models are normally distributed, which are reasonable.</a></li>
+<li><a href="#the-residuals-vs-fitted-plot-are-reasonably-distributed-and-no-patter-in-the-scatter-plot-is-found">The residuals vs fitted plot are reasonably distributed and no patter in the scatter plot is found</a></li>
+<li><a href="#residuals-vs-leverage-plot-shows-no-standingout-outliner.-so-i-am-confident-to-conclude-they-are-good-models.">residuals vs leverage plot shows no standingout outliner. So I am confident to conclude they are good models.</a></li>
+<li><a href="#if-i-must-choose-between-them-i-could-choose-model3-since-it-is-the-simplest-and-not-that-much">if I must choose between them, I could choose model3, since it is the simplest and not that much</a></li>
+<li><a href="#difference-to-model4-which-have-2-variables.">difference to model4, which have 2 variables.</a></li>
 </ul>
 </div>
 
@@ -161,14 +181,67 @@ $(document).ready(function () {
 <h1>link to my github repository <a href="https://github.com/qiuyufan/IODS-project.git" class="uri">https://github.com/qiuyufan/IODS-project.git</a></h1>
 <hr />
 </div>
-<div id="insert-chapter-2-title-here" class="section level1">
-<h1>Insert chapter 2 title here</h1>
+<div id="learning2014_linear-regression" class="section level1">
+<h1>Learning2014_linear regression</h1>
 <p><em>Describe the work you have done this week and summarize your learning.</em></p>
-<ul>
-<li>Describe your work and results clearly.</li>
-<li>Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods</li>
-<li>Assume the reader has no previous knowledge of your data or the more advanced methods you are using</li>
-</ul>
+<p>library(knitr) library(rmarkdown) #2 learning2014&lt;- read.table(“<a href="http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS3-data.txt" class="uri">http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS3-data.txt</a>”, sep=“”, header=TRUE) str(learning2014) dim(learning2014)</p>
+</div>
+<div id="the-dataset-learn2014-is-a-data-frame-and-has-183-rows-and-60-columns." class="section level1">
+<h1>the dataset learn2014 is a data frame and has 183 rows and 60 columns.</h1>
+</div>
+<div id="section" class="section level1">
+<h1>3</h1>
+</div>
+<div id="gender-age-attitude-deep-stra-surf-and-points" class="section level1">
+<h1>gender, age, attitude, deep, stra, surf and points</h1>
+<p>learning2014<span class="math inline">\(attitude &lt;- learning2014\)</span>Attitude / 10 library(dplyr) deep_questions &lt;- c(“D03”, “D11”, “D19”, “D27”, “D07”, “D14”, “D22”, “D30”,“D06”, “D15”, “D23”, “D31”) surface_questions &lt;- c(“SU02”,“SU10”,“SU18”,“SU26”, “SU05”,“SU13”,“SU21”,“SU29”,“SU08”,“SU16”,“SU24”,“SU32”) strategic_questions &lt;- c(“ST01”,“ST09”,“ST17”,“ST25”,“ST04”,“ST12”,“ST20”,“ST28”) learning2014<span class="math inline">\(deep &lt;- rowMeans (select(learning2014, one_of(deep_questions))) learning2014\)</span>surf &lt;- rowMeans(select(learning2014, one_of(surface_questions))) learning2014$stra &lt;- rowMeans(select(learning2014, one_of(strategic_questions))) keep_columns &lt;- c(“gender”,“Age”,“attitude”, “deep”, “stra”, “surf”, “Points”) newlearning2014 &lt;- select(learning2014, one_of(keep_columns)) str(newlearning2014) colnames(newlearning2014)<a href="#section-3">2</a> &lt;- “age” colnames(newlearning2014)[7] &lt;- “points” newlearning2014 &lt;- filter(newlearning2014,points &gt; 0) str(newlearning2014)</p>
+</div>
+<div id="section-1" class="section level1">
+<h1>4</h1>
+<p>getwd()</p>
+<p>setwd(“/Users/qiuyufan/IODS-project”) write.csv(newlearning2014, file = “newlearning2014.csv”,row.names=FALSE) openlearning2014 &lt;- read.csv(file=“newlearning2014.csv”, header=TRUE, sep=“,”) str(openlearning2014)</p>
+</div>
+<div id="analysis" class="section level1">
+<h1>Analysis</h1>
+</div>
+<div id="section-2" class="section level1">
+<h1>1</h1>
+<p>openlearning2014 &lt;- read.csv(file=“newlearning2014.csv”, header=TRUE, sep=“,”) str(openlearning2014) #This dataset contains 7 columns and 166 rows. attitude is the average of the Likert scale; points are the exam points; stra represents the average score of the strategic questions #surf means the average score of the surface questions. Deep is the average score of the deep questions.</p>
+</div>
+<div id="section-3" class="section level1">
+<h1>2</h1>
+<p>library(ggplot2) p1 &lt;- ggplot(newlearning2014, aes(x = attitude, y = points, col = gender)) p2 &lt;- p1 + geom_point() p3 &lt;- p2 + geom_smooth(method = “lm”) p4 &lt;- p3 + ggtitle(“Student’s attitude versus exam points”) p4 #As the p4 shows, student’s attitude is positively coorelated with exam points in both genders.</p>
+</div>
+<div id="section-4" class="section level1">
+<h1>3</h1>
+<p>pairs(newlearning2014[-1], col = newlearning2014$gender) install.packages(“GGally”) library(GGally) library(ggplot2) p &lt;- ggpairs(newlearning2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap(“facethist”, bins = 20))) p #based on the plot, strongest coorelation with points are: attitude, stra, and surf. #we then choose these three variables as parameters ggpairs(newlearning2014, lower = list(combo = wrap(“facethist”, bins = 20))) my_model2 &lt;- lm(points ~ attitude + surf + stra, data = newlearning2014) summary(my_model2) #The three parameters, attitude, structure and surface questions are significantly importance #to the final scores. But only attitude is statistically significant with the points.</p>
+</div>
+<div id="after-removing-the-parameters-of-stra-and-surf.-we-have-our-model3-attitude-is-the-only-variable-hitting" class="section level1">
+<h1>4 after removing the parameters of stra and surf. we have our model3, attitude is the only variable hitting</h1>
+</div>
+<div id="significance-level-below-0.05" class="section level1">
+<h1>significance level, below 0.05</h1>
+<p>my_model3 &lt;- lm(points ~ attitude, data = newlearning2014) summary(my_model3) #After different combinations with the variables, I decide to keep this model for comparison, #although the stra has p-value of 0.089 my_model4 &lt;- lm(points ~ attitude + stra, data = newlearning2014) summary(my_model4) #the multiple R-squared in model3 is 0.1906, which indicate that this model explains 19% of all the variablity #of the data around the mean #model4 is 0.2074, which indicate this model explain 20% of all the variablility of the data around the mean #Normally, higher R-squared, the better the model fits the data. But in psychology, or tests #involved in human behaviors, this value could be lower than 50%.</p>
+</div>
+<div id="section-5" class="section level1">
+<h1>5</h1>
+<p>par(mfrow = c(2,2)) plot(my_model3, which = c(1,2,5))</p>
+<p>par(mfrow = c(2,2)) plot(my_model4, which = c(1,2,5))</p>
+</div>
+<div id="both-models-qq-plot-from-the-show-that-the-errors-of-the-models-are-normally-distributed-which-are-reasonable." class="section level1">
+<h1>Both models’ QQ plot from the show that the errors of the models are normally distributed, which are reasonable.</h1>
+</div>
+<div id="the-residuals-vs-fitted-plot-are-reasonably-distributed-and-no-patter-in-the-scatter-plot-is-found" class="section level1">
+<h1>The residuals vs fitted plot are reasonably distributed and no patter in the scatter plot is found</h1>
+</div>
+<div id="residuals-vs-leverage-plot-shows-no-standingout-outliner.-so-i-am-confident-to-conclude-they-are-good-models." class="section level1">
+<h1>residuals vs leverage plot shows no standingout outliner. So I am confident to conclude they are good models.</h1>
+</div>
+<div id="if-i-must-choose-between-them-i-could-choose-model3-since-it-is-the-simplest-and-not-that-much" class="section level1">
+<h1>if I must choose between them, I could choose model3, since it is the simplest and not that much</h1>
+</div>
+<div id="difference-to-model4-which-have-2-variables." class="section level1">
+<h1>difference to model4, which have 2 variables.</h1>
 <hr />
 </div>
 
