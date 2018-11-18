@@ -429,7 +429,7 @@ loss_func(class = joined_data$high_use, prob = joined_data$probability)</code></
 <pre class="r"><code>library(boot)
 cv &lt;- cv.glm(data = joined_data, cost = loss_func, glmfit = m, K = 10)
 cv$delta[1]</code></pre>
-<pre><code>## [1] 0.3036649</code></pre>
+<pre><code>## [1] 0.3089005</code></pre>
 <p>My model using 10-fold cross-validation has 0.3089, higher error prediction.</p>
 </div>
 </div>
