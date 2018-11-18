@@ -1,0 +1,78 @@
+---
+title: "student performance data anaysis"
+author: "Qiuyufan"
+date: "11/18/2018"
+output: html_document
+---
+##Wrapping the data
+
+####1.Read both student-mat.csv and student-por.csv into R
+
+```{r}
+mat <- read.csv("student-mat.csv",header=TRUE, sep=";")
+summary(mat)
+dim(mat)
+
+
+```
+
+
+```{r}
+por <- read.csv("student-por.csv",header=TRUE, sep=";")
+summary(por)
+dim(por)
+```
+
+####2.Join the two datasets
+
+```{r}
+library(dplyr)
+join_by <- c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet")
+math_por <- inner_join(mat, por, by = join_by, suffix = c(".mat", ".por"))
+str(math_por)
+dim(math_por)
+```
+
+####3.Combine duplicated answers
+
+```{r}
+alc <- select(math_por, one_of(join_by))
+notjoined_columns <- colnames(mat)[!colnames(mat) %in% join_by]
+for(column_name in notjoined_columns) {
+  two_columns <- select(math_por, starts_with(column_name))
+  first_column <- select(two_columns, 1)[[1]]
+  if(is.numeric(first_column)) { 
+    alc[column_name] <- round(rowMeans(two_columns))
+  } else 
+    alc[column_name] <- first_column
+  }
+
+dim(alc)
+
+```
+
+####4.create new column and join the data
+
+```{r}
+alc <- mutate(alc, alc_use = (Dalc + Walc) / 2)
+alc <- mutate(alc, high_use = alc_use > 2)
+```
+
+####5. write the table to data folder
+
+```{r}
+dim(alc)
+write.csv(alc, file = "alc.csv",row.names=FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
