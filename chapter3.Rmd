@@ -1,0 +1,97 @@
+---
+title: "Analysis"
+author: "Qiuyufan"
+date: "11/18/2018"
+output: html_document
+---
+
+Analysis
+
+####1.read the data to R
+```{r}
+joined_data <- read.csv(file="alc.csv", header=TRUE)
+colnames(joined_data)
+summary(joined_data)
+```
+The data is combined by both student-mat.csv (Math course) and student-por.csv (Portuguese language course) datasets. The data attributes include student grades, demographic, social and school related features) and it was collected by using school reports and questionnaires.
+
+####2.Choose 4 interesting variables with alcohol consumption
+"sex", "guardian","freetime","paid"
+"sex": male would have high alcohol consumption, while female have low alcohol consumption
+"guardian":as father would have high consumption, with mother have low consumption
+"freetime": more free time, high consumption
+"paid": more paid, more consumption
+
+####3.explore the distributions of the chosen variables and their relationships with alcohol consumption
+```{r}
+library(ggplot2)
+library(dplyr)
+g2 <- ggplot(joined_data, aes(high_use))
+g2 + facet_wrap("sex") + geom_bar()
+```
+
+The first plot shows males (more than 1/2) have high alcohol consumption than females (less than1/3) 
+
+```{r}
+g2 + facet_wrap("guardian") + geom_bar()
+```
+
+Plot2 shows that being with mother has less high use alcohol percentage than being with father. 
+
+```{r}
+g2 + facet_wrap("freetime") + geom_bar()
+```
+
+Plot3 shows that students who enjoy most free time also enjoy the high use alcohol. It seems to be linearly correlated. 
+
+```{r}
+g2 + facet_wrap("paid") + geom_bar()
+```
+
+Plot4 shows that students who got paid have a slightly higher high use of alcohol consumption. 
+
+####4.Using logistic regression to explore the data
+```{r}
+m <- glm(high_use ~ freetime + paid + sex + guardian , data = joined_data, family = "binomial")
+summary(m)
+coef(m)
+```
+for sex, for male, high use of alcohol = -2.2203 + 0.8272*1= -1.3931, female = -2.2203 + 0.8272*0= -2.2203. 0.8272 indicates the increase in log odds that a male has of high alcohol consumption. the log odds and the log odds ratios are both significally significant as p-value are well below 0.05. But none of the other variables were below 0.05.
+
+####5.prediction with model
+
+```{r}
+probabilities <- predict(m, type = "response")
+joined_data <- mutate(joined_data, probability = probabilities)
+joined_data <- mutate(joined_data, prediction = probability > 0.5)
+select(joined_data, freetime, paid, sex,guardian, probability, prediction) %>% tail(10)
+table(high_use = joined_data$high_use, prediction = joined_data$prediction)
+g <- ggplot(joined_data, aes(x = probability, y = high_use, col = prediction))
+g + geom_point()
+table(high_use = joined_data$high_use, prediction = joined_data$prediction) %>% prop.table %>% addmargins
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+loss_func(class = joined_data$high_use, prob = joined_data$probability)
+```
+
+average number of incorrect predictions is 0.2958
+
+####6.Perform 10-fold cross-validation on my model
+```{r}
+library(boot)
+cv <- cv.glm(data = joined_data, cost = loss_func, glmfit = m, K = 10)
+cv$delta[1]
+```
+My model using 10-fold cross-validation has 0.3089, higher error prediction. 
+
+
+
+
+
+
+
+
+
+
