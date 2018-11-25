@@ -1,0 +1,107 @@
+---
+title: "Clustering and classification"
+author: "Qiuyufan"
+date: "11/19/2018"
+output: html_document
+---
+
+###Load and explore the Boston data
+```{r}
+chooseCRANmirror(graphics=FALSE, ind=1)
+library(MASS)
+str(Boston)
+dim(Boston)
+
+```
+The Boston data has 14 variables, 506 rows, a description of housing values in suburbs of Boston. Each variable represents the following meanings: crim, per capita crime rate by town.zn, proportion of residential land zoned for lots over 25,000 sq.ft.indus,proportion of non-retail business acres per town.chas, Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).nox, nitrogen oxides concentration (parts per 10 million).rm
+average number of rooms per dwelling. age, proportion of owner-occupied units built prior to 1940.dis, weighted mean of distances to five Boston employment centres.rad, index of accessibility to radial highways.tax, full-value property-tax rate per \$10,000.ptratio
+pupil-teacher ratio by town.black, 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.lstat, lower status of the population (percent).medv,median value of owner-occupied homes in \$1000s
+
+###explore the data with plot 
+```{r}
+library(dplyr)
+install.packages("corrplot")
+library(corrplot)
+pairs(Boston)
+cor_matrix<-cor(Boston) %>% round(digits = 2)
+cor_matrix
+corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.cex = 0.6)
+```
+As the plot shows that variables are positively and negatively correlated. For instance, variable, lower status of the population (percent) and median value of owner-occupied homes in \$1000s is negatively correlated.Also, rad, index of accessibility to radial highways.and tax, full-value property-tax rate per \$10,000 are positively related. Other highly correlated variables are: dis&indus; nox&age, indus&tax; rm&medv. 
+
+
+###strandardize the dataset and create a crime rate variable
+
+```{r}
+boston_scaled <- scale(Boston)
+boston_scaled<-as.data.frame(boston_scaled)
+summary(boston_scaled)
+#compared to the original dataset, the absolute value of the scaled version becomes smaller. Plus, they are scaled negatively and positively based on 0 value. Now they become easy to compare. 
+bins <- quantile(boston_scaled$crim)
+crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+boston_scaled <- data.frame(boston_scaled, crime)
+#Now the crime has changed to categorical variables. Next, we split the data: 
+n <- nrow(boston_scaled)
+ind <- sample(n,  size = n * 0.8)
+train <- boston_scaled[ind,]
+test <- boston_scaled[-ind,]
+correct_classes <- test$crime
+test <- dplyr::select(test, -crime)
+
+```
+
+###draw the LDA plot
+```{r}
+lda.fit <- lda(crime ~ ., data = train)
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+classes <- as.numeric(train$crime)
+plot(lda.fit, dimen = 2, col = classes, pch = classes)
+lda.arrows(lda.fit, myscale = 1)
+```
+###predict the classes with the LDA model
+```{r}
+lda.pred <- predict(lda.fit, newdata = test)
+table(correct = correct_classes, predicted = lda.pred$class)
+table(correct = correct_classes, predicted = lda.pred$class)%>%prop.table()%>%addmargins()
+#we can see from the table that the model does not predict so well. The predictor predicts med_low crime best. Worst at predicting med_high crime.   
+```
+###distance between the observations
+```{r}
+library(dplyr)
+library(MASS)
+library(ggplot2)
+data('Boston')
+boston_scaled <- scale(Boston)
+boston_scaled<-as.data.frame(boston_scaled)
+dist_eu <- dist(boston_scaled)
+summary(dist_eu)
+#Next we run k-means algorithm on the dataset and set the cluster number 3
+km <-kmeans(boston_scaled, centers = 3)
+pairs(boston_scaled, col = km$cluster)
+#Now we try cluster number 4
+km <-kmeans(boston_scaled, centers = 4)
+pairs(boston_scaled, col = km$cluster)
+#It is impossible to see from the pairs plot. We run the following codes to determine k
+set.seed(123)
+k_max <- 10
+twcss <- sapply(1:k_max, function(k){kmeans(boston_scaled, k)$tot.withinss})
+qplot(x = 1:k_max, y = twcss, geom = 'line')
+km <-kmeans(boston_scaled, centers = 4)
+pairs(boston_scaled, col = km$cluster)
+#As the plot shows: the elbow is at k=8 indicating the optimal k for this dataset
+
+```
+
+
+
+
+
+

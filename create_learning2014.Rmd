@@ -1,7 +1,15 @@
+---
+title: "create_learning2014"
+author: "Qiuyufan"
+date: "11/7/2018"
+output: html_document
+---
 #name: Qiuyu Fan
 #date: 6.11.2018
 #This is the code for regression and model validation
 
+library(knitr)
+library(rmarkdown)
 #2
 learning2014<- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=TRUE)
 str(learning2014)
@@ -101,5 +109,3 @@ plot(my_model4, which = c(1,2,5))
 #residuals vs leverage plot shows no standingout outliner. So I am confident to conclude they are good models. 
 #if I must choose between them, I could choose model3, since it is the simplest and not that much 
 #difference to model4, which have 2 variables. 
-
-
