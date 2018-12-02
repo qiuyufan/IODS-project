@@ -1,0 +1,64 @@
+
+```{r}
+human <- read.table("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human2.txt", sep  =",", header = T)
+library(GGally)
+library(dplyr)
+library(corrplot)
+library(tidyr)
+```
+1.Show a graphical overview of the data and show summaries of the variables in the data. 
+
+```{r}
+ggpairs(human)
+cor(human) %>% corrplot
+summary(human)
+```
+Mat.mor(maternal mortality ratio) is negatively correlated with life expectancy at birth; Edu.exp(expected years of schooling) is negatively correlated with maternal mortality ratio, and adolecent birth rate. Life exp is positively corelated with education(FM, and Exp); Mat.mor is positively corelated with ado.Birth. Percetange of female representatives in parliament and proportion of females with at least secondary education seem to have week correlation with other variables. 
+
+2. Perform principal component analysis (PCA) on the not standardized human data
+
+```{r}
+pca_human <- prcomp(human)
+summary(pca_human)
+biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"))
+
+```
+3. scale the data and perform PCA
+```{r}
+human_std <- scale(human)
+pca_human <- prcomp(human_std)
+biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"))
+```
+
+I cannot really interpret the unscaled plot as the value difference is so big. Only the GNI shows on the PCA plot. The scaled plot instead shows nicely the variables: expected years of schooling,ratio of education between female and male, life expectation, maternal mortality ratio, and adolescent birth rate are at PC1, percentage of female representatives in parliament and proportion of female at labor are at PC2. In general, PC1 might be health and knowledge component. PC2 is the about equality of sex, women empowerment. 
+
+4.
+```{r}
+human_std <- scale(human)
+pca_human <- prcomp(human_std)
+s <- summary(pca_human)
+pca_pr <- round(100*s$importance[2,], digits = 1) 
+pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
+biplot(pca_human, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+
+```
+This plot shows that countries like Iceland, Norway, Denmark have high percentage of female in parliament, and at laborforce (at PC2), high education, income, and life expectancy. Countries like Japan, Korea show high education, income, and life expectancy but low percentage of female in parliament, and at laborforce (at PC2). At the right lower quadrant, Yemen, Afrghanistan have high maternal mortality ratio and high birth rate, low education, life expectation, incomes. On the other hand, countries like Nepal, Rwanda, Mozambique, where women have relatively good rights but suffer from low education and incomes. 
+
+
+5.Multiple Correspondence Analysis on the tea data 
+
+```{r}
+library(FactoMineR)
+data(tea)
+keep_columns <- c("Tea", "How", "how", "sugar", "where", "lunch")
+tea_time <- select(tea, one_of(keep_columns))
+summary(tea_time)
+str(tea_time)
+gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+# multiple correspondence analysis
+mca <- MCA(tea_time, graph = FALSE)
+summary(mca)
+plot(mca, invisible=c("ind"), habillage = "quali")
+```
+As the MCA factor map shows that unpackaged, tea shop are more similar. tea bag and chain store are more similar. Where to buy the tea has a strong link to dimension 1, and dimension2; How people drink tea also seem to has a strong link to both dimensions. 
+
