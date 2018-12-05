@@ -11,8 +11,8 @@ RATS <- read.table("https://raw.githubusercontent.com/KimmoVehkalahti/MABS/maste
 str(RATS)
 summary(RATS)
 colnames(RATS)
-#RATS data frame has 16 observations and 13 variables. It is similar to the BPRS that two groups
-#are measured at different time points. 
+#RATS data frame has 16 observations and 13 variables. It is similar to the BPRS that two groups of mices' weight
+#are measured over a 9-week period 
 
 #2.
 library(dplyr)
@@ -26,7 +26,7 @@ RATS$ID <- factor(RATS$ID)
 BPRSL <-  BPRS %>% gather(key = weeks, value = bprs, -treatment, -subject)
 BPRSL <-  BPRSL %>% mutate(week = as.integer(substr(weeks,5,5)))
 glimpse(BPRSL)
-RATSL <-  RATS %>% gather(key = WDs, value = rats, -Group, -ID)
+RATSL <-  RATS %>% gather(key = WDs, value = Weight, -Group, -ID)
 RATSL <-  RATSL %>% mutate(Time = as.integer(substr(WDs,3,4)))
 glimpse(RATSL)
 
